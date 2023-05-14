@@ -17,6 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select * from [config].[stag_raw];",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
