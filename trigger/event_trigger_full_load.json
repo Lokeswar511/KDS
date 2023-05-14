@@ -13,8 +13,8 @@
 		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
-			"blobPathBeginsWith": "/src/blobs/coupon",
-			"blobPathEndsWith": ".csv",
+			"blobPathBeginsWith": "/src/blobs/Full_Load",
+			"blobPathEndsWith": "coupon.csv",
 			"ignoreEmptyBlobs": true,
 			"scope": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa",
 			"events": [
