@@ -385,7 +385,7 @@
 										"type": "String"
 									},
 									"ExeStatus": {
-										"value": "Success",
+										"value": "Failure",
 										"type": "String"
 									},
 									"pipelineName": {
