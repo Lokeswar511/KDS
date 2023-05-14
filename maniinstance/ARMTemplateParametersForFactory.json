@@ -19,6 +19,9 @@
 		},
 		"storageaccount_properties_typeProperties_url": {
 			"value": "https://karamdosa.dfs.core.windows.net/"
+		},
+		"event_trigger_full_load_properties_typeProperties_scope": {
+			"value": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
 		}
 	}
 }

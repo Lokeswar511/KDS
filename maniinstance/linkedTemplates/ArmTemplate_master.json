@@ -27,6 +27,10 @@
 			"type": "string",
 			"defaultValue": "https://karamdosa.dfs.core.windows.net/"
 		},
+		"event_trigger_full_load_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -68,6 +72,9 @@
 					},
 					"storageaccount_properties_typeProperties_url": {
 						"value": "[parameters('storageaccount_properties_typeProperties_url')]"
+					},
+					"event_trigger_full_load_properties_typeProperties_scope": {
+						"value": "[parameters('event_trigger_full_load_properties_typeProperties_scope')]"
 					}
 				}
 			},
