@@ -49,42 +49,14 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "src_files",
-						"type": "DatasetReference",
-						"parameters": {
-							"srccontainer": {
-								"value": "@pipeline().parameters.src_container",
-								"type": "Expression"
-							},
-							"srcfolder": {
-								"value": "@pipeline().parameters.src_folder",
-								"type": "Expression"
-							},
-							"srcfilename": {
-								"value": "@pipeline().parameters.src_filename",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "stg_raw_src",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "src_target",
-						"type": "DatasetReference",
-						"parameters": {
-							"destinationcontainer": {
-								"value": "@pipeline().parameters.des_container",
-								"type": "Expression"
-							},
-							"destinationfolder": {
-								"value": "@pipeline().parameters.des_folder",
-								"type": "Expression"
-							},
-							"destinationfile": {
-								"value": "@pipeline().parameters.des_filename",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "stg_raw_target",
+						"type": "DatasetReference"
 					}
 				]
 			}
