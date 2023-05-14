@@ -61,32 +61,6 @@
 				]
 			}
 		],
-		"parameters": {
-			"src_container": {
-				"type": "string",
-				"defaultValue": "stagging"
-			},
-			"src_folder": {
-				"type": "string",
-				"defaultValue": "employees"
-			},
-			"src_filename": {
-				"type": "string",
-				"defaultValue": "employees.csv"
-			},
-			"des_container": {
-				"type": "string",
-				"defaultValue": "raw"
-			},
-			"des_folder": {
-				"type": "string",
-				"defaultValue": "employees"
-			},
-			"des_filename": {
-				"type": "string",
-				"defaultValue": "employees.csv"
-			}
-		},
 		"folder": {
 			"name": "Execute_full_load"
 		},
