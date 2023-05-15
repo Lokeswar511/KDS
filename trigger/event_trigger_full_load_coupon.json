@@ -1,5 +1,5 @@
 {
-	"name": "event_trigger_full_load",
+	"name": "event_trigger_full_load_coupon",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Stopped",
