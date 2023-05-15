@@ -1,0 +1,17 @@
+{
+	"name": "schedule_trigger_incremental",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-05-16T10:32:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
