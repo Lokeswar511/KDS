@@ -99,15 +99,15 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"srccontainer": {
-											"value": "@item().src_container",
+											"value": "@item().stage_container",
 											"type": "Expression"
 										},
 										"srcfolder": {
-											"value": "@item().src_folder",
+											"value": "@item().stage_folder",
 											"type": "Expression"
 										},
 										"srcfilename": {
-											"value": "@item().src_filename",
+											"value": "@item().stage_filename",
 											"type": "Expression"
 										}
 									}
