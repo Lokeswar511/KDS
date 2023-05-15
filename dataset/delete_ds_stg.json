@@ -5,11 +5,20 @@
 			"referenceName": "storageaccount",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"folders": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().folders",
+					"type": "Expression"
+				},
 				"fileSystem": "stagging"
 			}
 		}

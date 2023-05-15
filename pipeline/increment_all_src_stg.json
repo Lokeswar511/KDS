@@ -1,5 +1,5 @@
 {
-	"name": "full_load_all_stg_raw",
+	"name": "increment_all_src_stg",
 	"properties": {
 		"activities": [
 			{
@@ -17,12 +17,12 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select * from config.stage_raw;",
+						"sqlReaderQuery": "select * from [config].[incremental];",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "config_stg_raw",
+						"referenceName": "config_incremental",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -64,7 +64,14 @@
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true,
-										"wildcardFileName": "*.csv",
+										"modifiedDatetimeStart": {
+											"value": "@startOfDay(utcNow())",
+											"type": "Expression"
+										},
+										"modifiedDatetimeEnd": {
+											"value": "@utcnow()",
+											"type": "Expression"
+										},
 										"enablePartitionDiscovery": false
 									},
 									"formatSettings": {
@@ -83,8 +90,6 @@
 									}
 								},
 								"enableStaging": false,
-								"parallelCopies": 4,
-								"dataIntegrationUnits": 8,
 								"translator": {
 									"type": "TabularTranslator",
 									"typeConversion": true,
@@ -100,15 +105,15 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"srccontainer": {
-											"value": "@item().stage_container",
+											"value": "@item().source_container",
 											"type": "Expression"
 										},
 										"srcfolder": {
-											"value": "@item().stage_folder",
+											"value": "@item().source_folder",
 											"type": "Expression"
 										},
 										"srcfilename": {
-											"value": "@item().stage_filename",
+											"value": "@item().source_filename",
 											"type": "Expression"
 										}
 									}
@@ -124,7 +129,7 @@
 											"type": "Expression"
 										},
 										"destinationfolder": {
-											"value": "@concat(item().destination_folder,'/', utcNow('yyyy-MM-dd'))",
+											"value": "@item().destination_folder",
 											"type": "Expression"
 										},
 										"destinationfile": {
@@ -136,7 +141,7 @@
 							]
 						},
 						{
-							"name": "Logs_on_success",
+							"name": "Logs_on_success_copy",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -254,7 +259,7 @@
 									},
 									"sourceTable": {
 										"value": {
-											"value": "@item().stage_filename",
+											"value": "@item().source_filename",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -420,7 +425,7 @@
 									},
 									"sourceTable": {
 										"value": {
-											"value": "@item().stage_filename",
+											"value": "@item().source_filename",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -466,58 +471,13 @@
 								"referenceName": "AzureSqlDatabase1",
 								"type": "LinkedServiceReference"
 							}
-						},
-						{
-							"name": "Delete1",
-							"type": "Delete",
-							"dependsOn": [
-								{
-									"activity": "Copy data1",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataset": {
-									"referenceName": "delete_ds_stg",
-									"type": "DatasetReference",
-									"parameters": {
-										"folders": {
-											"value": "@item().stage_folder",
-											"type": "Expression"
-										}
-									}
-								},
-								"logStorageSettings": {
-									"linkedServiceName": {
-										"referenceName": "storageaccount",
-										"type": "LinkedServiceReference"
-									},
-									"path": "logging"
-								},
-								"enableLogging": true,
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							}
 						}
 					]
 				}
 			}
 		],
 		"folder": {
-			"name": "Full_Load_stg_raw"
+			"name": "incremental_src_stage"
 		},
 		"annotations": []
 	}

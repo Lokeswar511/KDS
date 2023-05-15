@@ -1,5 +1,5 @@
 {
-	"name": "config_stg_raw",
+	"name": "config_incremental",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureSqlDatabase1",
@@ -17,15 +17,15 @@
 				"precision": 10
 			},
 			{
-				"name": "stage_container",
+				"name": "source_container",
 				"type": "varchar"
 			},
 			{
-				"name": "stage_folder",
+				"name": "source_folder",
 				"type": "varchar"
 			},
 			{
-				"name": "stage_filename",
+				"name": "source_filename",
 				"type": "varchar"
 			},
 			{
@@ -39,11 +39,15 @@
 			{
 				"name": "destination_filename",
 				"type": "varchar"
+			},
+			{
+				"name": "water_mark",
+				"type": "date"
 			}
 		],
 		"typeProperties": {
 			"schema": "config",
-			"table": "stage_raw"
+			"table": "incremental"
 		}
 	}
 }

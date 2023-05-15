@@ -1,15 +1,21 @@
 {
-	"name": "email",
+	"name": "Execute_full_load_src_stg_raw",
 	"properties": {
 		"activities": [
 			{
-				"name": "Web1",
+				"name": "email",
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "Wait1",
+						"activity": "Execute_src_stg",
 						"dependencyConditions": [
-							"Succeeded"
+							"Failed"
+						]
+					},
+					{
+						"activity": "Execute_stg_raw",
+						"dependencyConditions": [
+							"Failed"
 						]
 					}
 				],
@@ -33,42 +39,50 @@
 			{
 				"name": "Wait1",
 				"type": "Wait",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute_src_stg",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"waitTimeInSeconds": 2
 				}
 			},
 			{
-				"name": "Delete1",
-				"type": "Delete",
+				"name": "Execute_src_stg",
+				"type": "ExecutePipeline",
 				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataset": {
-						"referenceName": "delete_ds_stg",
-						"type": "DatasetReference"
+					"pipeline": {
+						"referenceName": "full_load_all",
+						"type": "PipelineReference"
 					},
-					"logStorageSettings": {
-						"linkedServiceName": {
-							"referenceName": "storageaccount",
-							"type": "LinkedServiceReference"
-						},
-						"path": "logging"
-					},
-					"enableLogging": true,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute_stg_raw",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Completed"
+						]
 					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "full_load_all_stg_raw",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
 				}
 			}
 		],
