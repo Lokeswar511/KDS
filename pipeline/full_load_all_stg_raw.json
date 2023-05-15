@@ -254,7 +254,7 @@
 									},
 									"sourceTable": {
 										"value": {
-											"value": "@item().src_filename",
+											"value": "@item().stage_filename",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -420,7 +420,7 @@
 									},
 									"sourceTable": {
 										"value": {
-											"value": "@item().src_filename",
+											"value": "@item().stage_filename",
 											"type": "Expression"
 										},
 										"type": "String"
