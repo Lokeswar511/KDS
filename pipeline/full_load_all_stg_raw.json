@@ -17,9 +17,13 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select * from [config].[stag_raw];",
+						"sqlReaderQuery": "select * from config.stage_raw;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "config_stg_raw",
+						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
