@@ -9,6 +9,12 @@
 					"referenceName": "full_load_all",
 					"type": "PipelineReference"
 				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "Execute_full_load_src_stg_raw",
+					"type": "PipelineReference"
+				}
 			}
 		],
 		"type": "BlobEventsTrigger",
