@@ -489,7 +489,13 @@
 							"typeProperties": {
 								"dataset": {
 									"referenceName": "delete_ds_stg",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"folders": {
+											"value": "@item().stage_folder",
+											"type": "Expression"
+										}
+									}
 								},
 								"logStorageSettings": {
 									"linkedServiceName": {
