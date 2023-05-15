@@ -1,5 +1,5 @@
 {
-	"name": "increment_all_files",
+	"name": "increment_customers_src_stg",
 	"properties": {
 		"activities": [
 			{
@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select * from [config].[incremental] where id = 1;",
+						"sqlReaderQuery": "select * from [config].[incremental];",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
