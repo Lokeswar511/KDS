@@ -1,5 +1,5 @@
 {
-	"name": "email",
+	"name": "Execute_full_load_src_stg_raw",
 	"properties": {
 		"activities": [
 			{
