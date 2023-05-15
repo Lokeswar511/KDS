@@ -28,6 +28,10 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
+					"pipeline": {
+						"referenceName": "incremental_all_stg_raw",
+						"type": "PipelineReference"
+					},
 					"waitOnCompletion": true
 				}
 			},
