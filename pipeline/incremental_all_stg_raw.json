@@ -489,7 +489,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folders": {
-											"value": "@item().stage_folder",
+											"value": "@item().source_folder",
 											"type": "Expression"
 										}
 									}
