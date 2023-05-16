@@ -27,6 +27,10 @@
 			"type": "string",
 			"defaultValue": "https://karamdosa.dfs.core.windows.net/"
 		},
+		"event_tigger_full_load_regions_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
+		},
 		"event_trigger_full_load_coupon_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
@@ -35,15 +39,11 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
 		},
-		"event_trigger_full_load_store_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
-		},
-		"event_tigger_full_load_regions_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
-		},
 		"event_trigger_full_load_products_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
+		},
+		"event_trigger_full_load_store_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/6be23797-1a34-4fa3-a666-425dcc711a37/resourceGroups/mani7571/providers/Microsoft.Storage/storageAccounts/karamdosa"
 		}
@@ -152,7 +152,8 @@
 				"folder": {
 					"name": "Execute_full_load"
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:25Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/full_load_all')]",
@@ -259,7 +260,8 @@
 				"folder": {
 					"name": "Execute_incremental"
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:21Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/increment_all_src_stg')]",
@@ -747,7 +749,8 @@
 				"folder": {
 					"name": "Full_Load_src_stg"
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2023-05-14T13:05:55Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/config_fullload')]",
@@ -1284,7 +1287,8 @@
 				"folder": {
 					"name": "Full_Load_stg_raw"
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:24Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/config_stg_raw')]",
@@ -1783,7 +1787,8 @@
 				"folder": {
 					"name": "incremental_src_stage"
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:21Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/config_incremental')]",
@@ -2317,7 +2322,8 @@
 				"folder": {
 					"name": "incremental_stage_raw"
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:21Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/config_incremental_raw')]",
@@ -2402,7 +2408,8 @@
 				"folder": {
 					"name": "Execute_full_load"
 				},
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:21Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/stg_raw_src')]",
@@ -2917,6 +2924,37 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/event_tigger_full_load_regions')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Execute_full_load_src_stg_raw",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/src/blobs/Full_Load/",
+					"blobPathEndsWith": "regions.csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('event_tigger_full_load_regions_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_coupon')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -2979,78 +3017,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_store')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Execute_full_load_src_stg_raw",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/src/blobs/Full_Load/",
-					"blobPathEndsWith": "store.csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('event_trigger_full_load_store_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "SelfHosted",
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/event_tigger_full_load_regions')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Execute_full_load_src_stg_raw",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/src/blobs/Full_Load/",
-					"blobPathEndsWith": "regions.csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('event_tigger_full_load_regions_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_products')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -3082,6 +3048,37 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_store')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Execute_full_load_src_stg_raw",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/src/blobs/Full_Load/",
+					"blobPathEndsWith": "store.csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('event_trigger_full_load_store_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/schedule_trigger_incremental')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -3102,8 +3099,8 @@
 					"recurrence": {
 						"frequency": "Day",
 						"interval": 1,
-						"startTime": "2023-05-16T10:32:00Z",
-						"timeZone": "UTC",
+						"startTime": "2023-05-16T10:32:00",
+						"timeZone": "India Standard Time",
 						"schedule": {}
 					}
 				}
@@ -3111,6 +3108,16 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/execute_incremental')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
 		}
 	]
 }
