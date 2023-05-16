@@ -2,7 +2,7 @@
 	"name": "schedule_trigger_incremental",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
