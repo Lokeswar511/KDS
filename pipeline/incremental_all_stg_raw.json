@@ -516,6 +516,8 @@
 		"folder": {
 			"name": "incremental_stage_raw"
 		},
-		"annotations": []
-	}
+		"annotations": [],
+		"lastPublishTime": "2023-05-15T05:37:21Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }

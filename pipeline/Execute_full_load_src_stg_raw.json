@@ -89,6 +89,8 @@
 		"folder": {
 			"name": "Execute_full_load"
 		},
-		"annotations": []
-	}
+		"annotations": [],
+		"lastPublishTime": "2023-05-15T05:37:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }

@@ -519,6 +519,8 @@
 		"folder": {
 			"name": "Full_Load_stg_raw"
 		},
-		"annotations": []
-	}
+		"annotations": [],
+		"lastPublishTime": "2023-05-15T05:37:24Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }

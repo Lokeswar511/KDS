@@ -22,5 +22,6 @@
 				"fileSystem": "stagging"
 			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
 }

@@ -49,5 +49,6 @@
 			"schema": "config",
 			"table": "incremental"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
 }
