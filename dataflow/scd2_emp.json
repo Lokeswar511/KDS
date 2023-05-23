@@ -1,0 +1,64 @@
+{
+	"name": "scd2_emp",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "sccd_src_emp",
+						"type": "DatasetReference"
+					},
+					"name": "srcemp"
+				},
+				{
+					"dataset": {
+						"referenceName": "emp_dim",
+						"type": "DatasetReference"
+					},
+					"name": "targetemp"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          emp_id as string,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          DOB as string,",
+				"          mobile as string,",
+				"          gender as string,",
+				"          address_street as string,",
+				"          address_city as string,",
+				"          entry_date as string,",
+				"          store_store_id as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: false) ~> srcemp",
+				"source(output(",
+				"          emp_key as integer,",
+				"          employee_id as integer,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          DOB as date,",
+				"          mobile as string,",
+				"          gender as string,",
+				"          address_street as string,",
+				"          city as string,",
+				"          last_update_date as timestamp,",
+				"          created_date as timestamp,",
+				"          ef_start__date as timestamp,",
+				"          ef_end_date as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> targetemp"
+			]
+		}
+	}
+}
