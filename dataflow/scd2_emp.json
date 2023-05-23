@@ -26,6 +26,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "emp_dim",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
 				}
 			],
 			"transformations": [
@@ -95,8 +102,7 @@
 				"          de_last_updated = currentTimestamp(),",
 				"          de_created_date = currentTimestamp(),",
 				"          de_end_date = toDate('9999-12-31')) ~> derivedColumn1",
-				"derivedColumn1 alterRow(insertIf(active=='I'||active=='U'),",
-				"     updateIf(active=='U')) ~> alterRow1",
+				"derivedColumn1 alterRow(updateIf(active=='U')) ~> alterRow1",
 				"alterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -135,7 +141,40 @@
 				"          ef_start__date = de_ef_start_date,",
 				"          ef_end_date = de_end_date,",
 				"          DOB = src_DOB",
-				"     )) ~> sink1"
+				"     )) ~> sink1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          emp_key as integer,",
+				"          employee_id as integer,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          DOB as date,",
+				"          mobile as string,",
+				"          gender as string,",
+				"          address_street as string,",
+				"          city as string,",
+				"          last_update_date as timestamp,",
+				"          created_date as timestamp,",
+				"          ef_start__date as timestamp,",
+				"          ef_end_date as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['emp_key'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          emp_key,",
+				"          employee_id,",
+				"          last_name,",
+				"          city,",
+				"          ef_end_date = de_ef_end_date",
+				"     )) ~> sink2"
 			]
 		}
 	}
