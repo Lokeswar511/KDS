@@ -108,7 +108,7 @@
 				"          de_eff_end_date = currentTimestamp()) ~> derivedColumn1",
 				"derivedColumn1 split(active=='I'||active=='U',",
 				"     active=='U',",
-				"     disjoint: false) ~> split1@(insert, Update)",
+				"     disjoint: true) ~> split1@(insert, Update)",
 				"split1@insert alterRow(insertIf(active=='I'||active=='U')) ~> alterRow1",
 				"split1@Update alterRow(updateIf(active=='U')) ~> alterRow2",
 				"alterRow1 sink(allowSchemaDrift: true,",
