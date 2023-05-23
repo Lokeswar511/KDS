@@ -26,6 +26,12 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "alterRow1"
 				}
 			],
 			"scriptLines": [
@@ -65,24 +71,26 @@
 				"     inferDriftedColumnTypes: true,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> targetemp",
-				"select1, targetemp join(emp_id == employee_id,",
-				"     joinType:'outer',",
+				"select1, targetemp join(src_emp_id == employee_id,",
+				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> join1",
 				"srcemp select(mapColumn(",
-				"          emp_id,",
-				"          first_name,",
-				"          last_name,",
-				"          DOB,",
-				"          mobile,",
-				"          gender,",
-				"          address_street,",
-				"          address_city,",
-				"          entry_date",
+				"          src_emp_id = emp_id,",
+				"          srcf_irst_name = first_name,",
+				"          src_last_name = last_name,",
+				"          src_DOB = DOB,",
+				"          src_mobile = mobile,",
+				"          src_gender = gender,",
+				"          src_address_street = address_street,",
+				"          src_address_city = address_city,",
+				"          src_entry_date = entry_date",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"join1 derive(active = iif( isNull(employee_id), 'I', iif(last_name!= src_last_name && src_address_city!=city, 'U','R'))) ~> derivedColumn1",
+				"derivedColumn1 alterRow(upsertIf(active=='I'||active=='U')) ~> alterRow1"
 			]
 		}
 	}
