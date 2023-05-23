@@ -19,7 +19,15 @@
 					"name": "targetemp"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "emp_dim",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "join1"
@@ -89,8 +97,35 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"join1 derive(active = iif( isNull(employee_id), 'I', iif(last_name!= src_last_name && src_address_city!=city, 'U','R'))) ~> derivedColumn1",
-				"derivedColumn1 alterRow(upsertIf(active=='I'||active=='U')) ~> alterRow1"
+				"join1 derive(active = iif( isNull(employee_id), 'I', iif(last_name!= src_last_name && src_address_city!=city, 'U','R')),",
+				"          de_ef_end_date = currentTimestamp()) ~> derivedColumn1",
+				"derivedColumn1 alterRow(upsertIf(active=='I'||active=='U')) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          emp_key as integer,",
+				"          employee_id as integer,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          DOB as date,",
+				"          mobile as string,",
+				"          gender as string,",
+				"          address_street as string,",
+				"          city as string,",
+				"          last_update_date as timestamp,",
+				"          created_date as timestamp,",
+				"          ef_start__date as timestamp,",
+				"          ef_end_date as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['employee_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
