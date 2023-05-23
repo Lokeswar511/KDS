@@ -33,6 +33,449 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/scd2_emp')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "sccd_src_emp",
+								"type": "DatasetReference"
+							},
+							"name": "srcemp"
+						},
+						{
+							"dataset": {
+								"referenceName": "emp_dim",
+								"type": "DatasetReference"
+							},
+							"name": "targetemp"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "emp_dim",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "emp_dim",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "alterRow1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          emp_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          DOB as date,",
+						"          mobile as string,",
+						"          gender as string,",
+						"          address_street as string,",
+						"          address_city as string,",
+						"          entry_date as timestamp,",
+						"          store_store_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> srcemp",
+						"source(output(",
+						"          emp_key as integer,",
+						"          employee_id as integer,",
+						"          last_name as string,",
+						"          city as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'select emp_key, employee_id, last_name, city  from [kd].[employees_d] where ef_end_date = cast(\\'9999-12-31\\' as datetime)',",
+						"     format: 'query') ~> targetemp",
+						"select1, targetemp join(src_emp_id == employee_id,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"srcemp select(mapColumn(",
+						"          src_emp_id = emp_id,",
+						"          srcf_irst_name = first_name,",
+						"          src_last_name = last_name,",
+						"          src_DOB = DOB,",
+						"          src_mobile = mobile,",
+						"          src_gender = gender,",
+						"          src_address_street = address_street,",
+						"          src_address_city = address_city,",
+						"          src_entry_date = entry_date",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"join1 derive(active = iif( isNull(emp_key), 'I', iif(last_name!= src_last_name && src_address_city!=city, 'U','R')),",
+						"          de_ef_end_date = currentTimestamp(),",
+						"          de_ef_start_date = currentTimestamp(),",
+						"          de_last_updated = currentTimestamp(),",
+						"          de_created_date = currentTimestamp(),",
+						"          de_end_date = toDate('9999-12-31')) ~> derivedColumn1",
+						"derivedColumn1 alterRow(updateIf(active=='U')) ~> alterRow1",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          emp_key as integer,",
+						"          employee_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          DOB as date,",
+						"          mobile as string,",
+						"          gender as string,",
+						"          address_street as string,",
+						"          city as string,",
+						"          last_update_date as timestamp,",
+						"          created_date as timestamp,",
+						"          ef_start__date as timestamp,",
+						"          ef_end_date as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          employee_id = src_emp_id,",
+						"          first_name = srcf_irst_name,",
+						"          last_name = src_last_name,",
+						"          mobile = src_mobile,",
+						"          gender = src_gender,",
+						"          address_street = src_address_street,",
+						"          city = src_address_city,",
+						"          last_update_date = de_last_updated,",
+						"          created_date = de_created_date,",
+						"          ef_start__date = de_ef_start_date,",
+						"          ef_end_date = de_end_date,",
+						"          DOB = src_DOB",
+						"     )) ~> sink1",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          emp_key as integer,",
+						"          employee_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          DOB as date,",
+						"          mobile as string,",
+						"          gender as string,",
+						"          address_street as string,",
+						"          city as string,",
+						"          last_update_date as timestamp,",
+						"          created_date as timestamp,",
+						"          ef_start__date as timestamp,",
+						"          ef_end_date as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:true,",
+						"     keys:['emp_key'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          emp_key,",
+						"          employee_id,",
+						"          last_name,",
+						"          city,",
+						"          ef_end_date = de_ef_end_date",
+						"     )) ~> sink2"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Execute_full_load_src_stg_raw')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "email",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Execute_src_stg",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "Execute_stg_raw",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://prod-43.eastus.logic.azure.com:443/workflows/fbccebfe6ad1469798b3570655f560b3/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=4oTzntw7P-LN7EymWH6Yfs_8_As_7s8E8vbEXa6uEGo",
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"value": "{\n    'pipelinename' : '@{pipeline().Pipeline}',\n    'datafactoryname' : '@{pipeline().DataFactory}',\n    'runid' : '@{pipeline().RunId}'\n}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "Execute_src_stg",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 2
+						}
+					},
+					{
+						"name": "Execute_src_stg",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "full_load_all",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Execute_stg_raw",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Wait1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "full_load_all_stg_raw",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "Execute_full_load"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:25Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/execute_incremental')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute_inc_src_stg",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "increment_all_src_stg",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Execute_inc_stg_raw",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Wait1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "incremental_all_stg_raw",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "Execute_inc_src_stg",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 1
+						}
+					},
+					{
+						"name": "email",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Execute_inc_src_stg",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "Execute_inc_stg_raw",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://prod-43.eastus.logic.azure.com:443/workflows/fbccebfe6ad1469798b3570655f560b3/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=4oTzntw7P-LN7EymWH6Yfs_8_As_7s8E8vbEXa6uEGo",
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"value": "{\n    'pipelinename' : '@{pipeline().Pipeline}',\n    'datafactoryname' : '@{pipeline().DataFactory}',\n    'runid' : '@{pipeline().RunId}'\n}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "Execute_incremental"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-05-15T05:37:21Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/scd2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "scd2_emp",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"srcemp": {},
+									"targetemp": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/scd2_emp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/event_tigger_full_load_regions')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -59,7 +502,9 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_coupon')]",
@@ -88,7 +533,9 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_employees')]",
@@ -117,7 +564,9 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_products')]",
@@ -146,7 +595,9 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/event_trigger_full_load_store')]",
@@ -175,7 +626,9 @@
 					]
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Execute_full_load_src_stg_raw')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/schedule_trigger_incremental')]",
@@ -199,12 +652,13 @@
 						"frequency": "Day",
 						"interval": 1,
 						"startTime": "2023-05-16T10:56:00",
-						"timeZone": "India Standard Time",
-						"schedule": {}
+						"timeZone": "India Standard Time"
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/execute_incremental')]"
+			]
 		}
 	]
 }

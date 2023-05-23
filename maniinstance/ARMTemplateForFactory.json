@@ -2417,6 +2417,55 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/scd2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "scd2_emp",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"srcemp": {},
+									"targetemp": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 16,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/scd2_emp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/config_fullload')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2662,6 +2711,160 @@
 						"fileSystem": "stagging"
 					}
 				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/storageaccount')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/emp_dim')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "emp_key",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "employee_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "first_name",
+						"type": "varchar"
+					},
+					{
+						"name": "last_name",
+						"type": "varchar"
+					},
+					{
+						"name": "DOB",
+						"type": "date"
+					},
+					{
+						"name": "mobile",
+						"type": "varchar"
+					},
+					{
+						"name": "gender",
+						"type": "varchar"
+					},
+					{
+						"name": "address_street",
+						"type": "varchar"
+					},
+					{
+						"name": "city",
+						"type": "varchar"
+					},
+					{
+						"name": "last_update_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "created_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ef_start__date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ef_end_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "kd",
+					"table": "employees_d"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sccd_src_emp')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "storageaccount",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "employees.csv",
+						"folderPath": "Full_Load",
+						"fileSystem": "src"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "emp_id",
+						"type": "String"
+					},
+					{
+						"name": "first_name",
+						"type": "String"
+					},
+					{
+						"name": "last_name",
+						"type": "String"
+					},
+					{
+						"name": "DOB",
+						"type": "String"
+					},
+					{
+						"name": "mobile",
+						"type": "String"
+					},
+					{
+						"name": "gender",
+						"type": "String"
+					},
+					{
+						"name": "address_street",
+						"type": "String"
+					},
+					{
+						"name": "address_city",
+						"type": "String"
+					},
+					{
+						"name": "entry_date",
+						"type": "String"
+					},
+					{
+						"name": "store_store_id",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/storageaccount')]"
@@ -3100,8 +3303,7 @@
 						"frequency": "Day",
 						"interval": 1,
 						"startTime": "2023-05-16T10:56:00",
-						"timeZone": "India Standard Time",
-						"schedule": {}
+						"timeZone": "India Standard Time"
 					}
 				}
 			},
@@ -3118,6 +3320,193 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/scd2_emp')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "sccd_src_emp",
+								"type": "DatasetReference"
+							},
+							"name": "srcemp"
+						},
+						{
+							"dataset": {
+								"referenceName": "emp_dim",
+								"type": "DatasetReference"
+							},
+							"name": "targetemp"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "emp_dim",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "emp_dim",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "alterRow1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          emp_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          DOB as date,",
+						"          mobile as string,",
+						"          gender as string,",
+						"          address_street as string,",
+						"          address_city as string,",
+						"          entry_date as timestamp,",
+						"          store_store_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> srcemp",
+						"source(output(",
+						"          emp_key as integer,",
+						"          employee_id as integer,",
+						"          last_name as string,",
+						"          city as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'select emp_key, employee_id, last_name, city  from [kd].[employees_d] where ef_end_date = cast(\\'9999-12-31\\' as datetime)',",
+						"     format: 'query') ~> targetemp",
+						"select1, targetemp join(src_emp_id == employee_id,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"srcemp select(mapColumn(",
+						"          src_emp_id = emp_id,",
+						"          srcf_irst_name = first_name,",
+						"          src_last_name = last_name,",
+						"          src_DOB = DOB,",
+						"          src_mobile = mobile,",
+						"          src_gender = gender,",
+						"          src_address_street = address_street,",
+						"          src_address_city = address_city,",
+						"          src_entry_date = entry_date",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"join1 derive(active = iif( isNull(emp_key), 'I', iif(last_name!= src_last_name && src_address_city!=city, 'U','R')),",
+						"          de_ef_end_date = currentTimestamp(),",
+						"          de_ef_start_date = currentTimestamp(),",
+						"          de_last_updated = currentTimestamp(),",
+						"          de_created_date = currentTimestamp(),",
+						"          de_end_date = toDate('9999-12-31')) ~> derivedColumn1",
+						"derivedColumn1 alterRow(updateIf(active=='U')) ~> alterRow1",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          emp_key as integer,",
+						"          employee_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          DOB as date,",
+						"          mobile as string,",
+						"          gender as string,",
+						"          address_street as string,",
+						"          city as string,",
+						"          last_update_date as timestamp,",
+						"          created_date as timestamp,",
+						"          ef_start__date as timestamp,",
+						"          ef_end_date as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          employee_id = src_emp_id,",
+						"          first_name = srcf_irst_name,",
+						"          last_name = src_last_name,",
+						"          mobile = src_mobile,",
+						"          gender = src_gender,",
+						"          address_street = src_address_street,",
+						"          city = src_address_city,",
+						"          last_update_date = de_last_updated,",
+						"          created_date = de_created_date,",
+						"          ef_start__date = de_ef_start_date,",
+						"          ef_end_date = de_end_date,",
+						"          DOB = src_DOB",
+						"     )) ~> sink1",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          emp_key as integer,",
+						"          employee_id as integer,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          DOB as date,",
+						"          mobile as string,",
+						"          gender as string,",
+						"          address_street as string,",
+						"          city as string,",
+						"          last_update_date as timestamp,",
+						"          created_date as timestamp,",
+						"          ef_start__date as timestamp,",
+						"          ef_end_date as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:false,",
+						"     upsertable:true,",
+						"     keys:['emp_key'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          emp_key,",
+						"          employee_id,",
+						"          last_name,",
+						"          city,",
+						"          ef_end_date = de_ef_end_date",
+						"     )) ~> sink2"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/sccd_src_emp')]",
+				"[concat(variables('factoryId'), '/datasets/emp_dim')]"
+			]
 		}
 	]
 }
