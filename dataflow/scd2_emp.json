@@ -47,7 +47,7 @@
 				"          emp_id as integer,",
 				"          first_name as string,",
 				"          last_name as string,",
-				"          DOB as string,",
+				"          DOB as date,",
 				"          mobile as string,",
 				"          gender as string,",
 				"          address_street as string,",
@@ -131,7 +131,8 @@
 				"          last_update_date = de_last_updated,",
 				"          created_date = de_last_updated,",
 				"          ef_start__date = de_ef_start_date,",
-				"          ef_end_date = de_ef_end_date",
+				"          ef_end_date = de_ef_end_date,",
+				"          DOB = src_DOB",
 				"     )) ~> sink1"
 			]
 		}
