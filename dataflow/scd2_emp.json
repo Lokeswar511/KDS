@@ -173,9 +173,8 @@
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          emp_key,",
-				"          employee_id,",
-				"          last_name,",
-				"          city,",
+				"          last_name = src_last_name,",
+				"          city = src_address_city,",
 				"          ef_end_date = de_ef_end_date",
 				"     )) ~> sinkupdate"
 			]
