@@ -25,14 +25,14 @@
 						"referenceName": "emp_dim",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "sinkinsert"
 				},
 				{
 					"dataset": {
 						"referenceName": "emp_dim",
 						"type": "DatasetReference"
 					},
-					"name": "sink2"
+					"name": "sinkupdate"
 				}
 			],
 			"transformations": [
@@ -143,7 +143,7 @@
 				"          ef_start__date = de_ef_start_date,",
 				"          ef_end_date = de_end_date,",
 				"          DOB = src_DOB",
-				"     )) ~> sink1",
+				"     )) ~> sinkinsert",
 				"alterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -177,7 +177,7 @@
 				"          last_name,",
 				"          city,",
 				"          ef_end_date = de_ef_end_date",
-				"     )) ~> sink2"
+				"     )) ~> sinkupdate"
 			]
 		}
 	}
