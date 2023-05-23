@@ -19,25 +19,10 @@
 					"name": "targetemp"
 				}
 			],
-			"sinks": [
-				{
-					"dataset": {
-						"referenceName": "emp_dim",
-						"type": "DatasetReference"
-					},
-					"name": "sinkinsert"
-				},
-				{
-					"dataset": {
-						"referenceName": "emp_dim",
-						"type": "DatasetReference"
-					},
-					"name": "sinkupdate"
-				}
-			],
+			"sinks": [],
 			"transformations": [
 				{
-					"name": "join1"
+					"name": "lookup1"
 				},
 				{
 					"name": "select1"
@@ -46,7 +31,7 @@
 					"name": "derivedColumn1"
 				},
 				{
-					"name": "alterRow1"
+					"name": "split1"
 				}
 			],
 			"scriptLines": [
@@ -78,14 +63,14 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'select emp_key, employee_id, last_name, city  from [kd].[employees_d] where ef_end_date = cast(\\'9999-12-31\\' as datetime)',",
 				"     format: 'query') ~> targetemp",
-				"select1, targetemp join(src_emp_id == employee_id,",
-				"     joinType:'left',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
+				"select1, targetemp lookup(src_emp_id == employee_id,",
+				"     multiple: false,",
+				"     pickup: 'first',",
+				"     asc(employee_id, true),",
+				"     broadcast: 'auto')~> lookup1",
 				"srcemp select(mapColumn(",
 				"          src_emp_id = emp_id,",
-				"          srcf_irst_name = first_name,",
+				"          src_first_name = first_name,",
 				"          src_last_name = last_name,",
 				"          src_DOB = DOB,",
 				"          src_mobile = mobile,",
@@ -96,87 +81,12 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"join1 derive(active = iif( isNull(emp_key), 'I', iif(last_name!= src_last_name && src_address_city!=city, 'U','R')),",
-				"          de_ef_end_date = currentTimestamp(),",
-				"          de_ef_start_date = currentTimestamp(),",
-				"          de_last_updated = currentTimestamp(),",
-				"          de_created_date = currentTimestamp(),",
-				"          de_end_date = toDate('9999-12-31')) ~> derivedColumn1",
-				"derivedColumn1 alterRow(updateIf(active=='U'),",
-				"     insertIf(active=='I'||active=='U')) ~> alterRow1",
-				"alterRow1 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          emp_key as integer,",
-				"          employee_id as integer,",
-				"          first_name as string,",
-				"          last_name as string,",
-				"          DOB as date,",
-				"          mobile as string,",
-				"          gender as string,",
-				"          address_street as string,",
-				"          city as string,",
-				"          last_update_date as timestamp,",
-				"          created_date as timestamp,",
-				"          ef_start__date as timestamp,",
-				"          ef_end_date as timestamp",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     saveOrder: 1,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          employee_id = src_emp_id,",
-				"          first_name = srcf_irst_name,",
-				"          last_name = src_last_name,",
-				"          mobile = src_mobile,",
-				"          gender = src_gender,",
-				"          address_street = src_address_street,",
-				"          city = src_address_city,",
-				"          last_update_date = de_last_updated,",
-				"          created_date = de_created_date,",
-				"          ef_start__date = de_ef_start_date,",
-				"          ef_end_date = de_end_date,",
-				"          DOB = src_DOB",
-				"     )) ~> sinkinsert",
-				"alterRow1 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          emp_key as integer,",
-				"          employee_id as integer,",
-				"          first_name as string,",
-				"          last_name as string,",
-				"          DOB as date,",
-				"          mobile as string,",
-				"          gender as string,",
-				"          address_street as string,",
-				"          city as string,",
-				"          last_update_date as timestamp,",
-				"          created_date as timestamp,",
-				"          ef_start__date as timestamp,",
-				"          ef_end_date as timestamp",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:false,",
-				"     updateable:false,",
-				"     upsertable:true,",
-				"     keys:['emp_key'],",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     saveOrder: 2,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          emp_key,",
-				"          last_name = src_last_name,",
-				"          city = src_address_city,",
-				"          ef_end_date = de_ef_end_date",
-				"     )) ~> sinkupdate"
+				"lookup1 derive(active = iif(isNull(emp_key), 'I', iif(src_last_name!=last_name&&src_address_city!=city, 'U', 'R')),",
+				"          end_date = toDate('9999-12-31'),",
+				"          currentdate = currentTimestamp(),",
+				"          de_eff_end_date = currentTimestamp()) ~> derivedColumn1",
+				"derivedColumn1 split(ERROR_FUNCTION(''),",
+				"     disjoint: false) ~> split1@(, )"
 			]
 		}
 	}
