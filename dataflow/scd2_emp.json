@@ -20,10 +20,17 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
-				"          emp_id as string,",
+				"          emp_id as integer,",
 				"          first_name as string,",
 				"          last_name as string,",
 				"          DOB as string,",
@@ -31,7 +38,7 @@
 				"          gender as string,",
 				"          address_street as string,",
 				"          address_city as string,",
-				"          entry_date as string,",
+				"          entry_date as timestamp,",
 				"          store_store_id as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
@@ -57,7 +64,25 @@
 				"     validateSchema: false,",
 				"     inferDriftedColumnTypes: true,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> targetemp"
+				"     format: 'table') ~> targetemp",
+				"select1, targetemp join(emp_id == employee_id,",
+				"     joinType:'outer',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"srcemp select(mapColumn(",
+				"          emp_id,",
+				"          first_name,",
+				"          last_name,",
+				"          DOB,",
+				"          mobile,",
+				"          gender,",
+				"          address_street,",
+				"          address_city,",
+				"          entry_date",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1"
 			]
 		}
 	}
